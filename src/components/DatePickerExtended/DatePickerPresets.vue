@@ -130,6 +130,7 @@
     padding-inline: 12px 26px;
     position: relative;
     width: 180px !important;
+    min-width: 180px !important; /* fix */
     height: 280px;
   }
 
