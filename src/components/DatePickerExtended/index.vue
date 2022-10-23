@@ -8,6 +8,8 @@
       collapsed: shownPresets,
     }"
     @click:date="presetsKey++"
+    @toggle-pressets="TestFunc"
+    :presets-shown="shownPresets"
   >
     <template #presets>
       <date-picker-presets
@@ -30,13 +32,65 @@
 <script>
   import { VDatePicker } from 'vuetify/lib';
   import { VPicker } from 'vuetify/lib/components/VPicker/';
+  import { VBtn } from 'vuetify/lib/components/VBtn/';
+
+  import VIcon from 'vuetify/lib/components/VIcon';
   import { convertToUnit } from 'vuetify/lib/util/helpers';
   import DatePickerPresets from '@/components/DatePickerExtended/DatePickerPresets.vue';
   import moment from 'moment';
   import Vue from 'vue';
 
   const VPickerExtended = VPicker.extend({
+    props: {
+      presetsShown: Boolean,
+    },
+    computed: {
+      togglerIcon() {
+        let icon = '';
+        if (this.isXSBreakpoint) {
+          icon = this.presetsShown
+            ? 'mdi-arrow-collapse-up'
+            : 'mdi-arrow-collapse-down';
+        }
+        return icon;
+      },
+      isXSBreakpoint() {
+        return this.$vuetify.breakpoint.xs;
+      },
+    },
     methods: {
+      genTogglerIcon() {
+        return this.$createElement(VIcon, {}, [this.togglerIcon]);
+      },
+      geenTogglerBtn() {
+        return this.$createElement(
+          VBtn,
+          {
+            staticClass: 'v-btn-toggle--presets',
+            props: {
+              fab: true,
+              'x-small': true,
+            },
+            on: {
+              click: () => this.$emit('toggle-pressets'),
+            },
+          },
+          [this.genTogglerIcon()]
+        );
+      },
+      genTitle() {
+        const btn = this.isXSBreakpoint ? this.geenTogglerBtn() : null;
+        return this.$createElement(
+          'div',
+          this.setBackgroundColor(this.computedTitleColor, {
+            staticClass: 'v-picker__title',
+            class: {
+              'v-picker__title--landscape': this.landscape,
+            },
+          }),
+          [this.$slots.title, btn]
+        );
+      },
       genBody() {
         return this.$createElement(
           'div',
@@ -56,10 +110,36 @@
         );
       },
     },
+    render(h) {
+      return h(
+        'div',
+        {
+          staticClass: 'v-picker v-card',
+          class: {
+            'v-picker--flat': this.flat,
+            'v-picker--landscape': this.landscape,
+            'v-picker--full-width': this.fullWidth,
+            ...this.themeClasses,
+            ...this.elevationClasses,
+          },
+          on: {
+            'toggle-pressets': () => this.$emit('toggle-pressets'),
+          },
+        },
+        [
+          this.$slots.title ? this.genTitle() : null,
+          this.genBody(),
+          this.$slots.actions ? this.genActions() : null,
+        ]
+      );
+    },
   });
 
   const DatesPickerComponent = Vue.component('dates-picker-component', {
     extends: VDatePicker,
+    props: {
+      presetsShown: Boolean, // Add
+    },
     computed: {
       isXSBreakpoint() {
         return this.$vuetify.breakpoint.xs;
@@ -122,6 +202,10 @@
               light: this.light,
               width: this.width,
               noTitle: this.noTitle,
+              presetsShown: this.presetsShown, // Add
+            },
+            on: {
+              'toggle-pressets': () => this.$emit('toggle-pressets'),
             },
           },
           children
@@ -147,7 +231,7 @@
     data: () => ({
       moment,
       localDates: [],
-      shownPresets: false,
+      shownPresets: true,
       presetsKey: 0,
     }),
 
@@ -164,6 +248,10 @@
       this.localDates = [...this.dates];
     },
     methods: {
+      TestFunc() {
+        console.log('TestFunc');
+        this.shownPresets = !this.shownPresets;
+      },
       presetsClicked(dates) {
         if (dates != null) {
           this.localDates = dates;
@@ -201,6 +289,7 @@
 
   .v-picker--dates-extended.breakpoint-xs .v-picker__body {
     height: 290px;
+    position: relative;
   }
 
   .v-picker--dates-extended .v-picker__body > :first-child:is(div) {

@@ -18,14 +18,12 @@
       ></v-btn>
     </v-btn-toggle>
     <v-btn
+      v-if="isSmAndUpBreakpoint"
       ref="toggler"
       light
       x-small
-      :fab="isXSBreakpoint"
-      :icon="isSmAndUpBreakpoint"
-      @click.stop="$emit('click-collapse', !collapsed)"
+      @click.stop="$emit('toggle-presets', !collapsed)"
       class="v-btn-toggle--presets"
-      :style="[offsetTop]"
     >
       <v-icon dark v-text="togglerIcon"></v-icon>
     </v-btn>
@@ -80,13 +78,6 @@
       heightBtn: 0,
     }),
     computed: {
-      offsetTop() {
-        return {
-          top: this.isXSBreakpoint
-            ? `${this.heightTitle - this.heightBtn / 2}px`
-            : null,
-        };
-      },
       isXSBreakpoint() {
         return this.$vuetify.breakpoint.xs;
       },
@@ -106,11 +97,6 @@
         }
         return icon;
       },
-    },
-    mounted() {
-      this.heightTitle =
-        this.$parent.$el.querySelector('.v-picker__title').clientHeight;
-      this.heightBtn = this.$refs.toggler.$el.clientHeight;
     },
     watch: {
       btnModel(newVal) {
@@ -135,8 +121,10 @@
   }
 
   .v-picker--dates-extended.breakpoint-xs .v-btn-toggle--presets {
-    position: fixed;
+    position: absolute !important;
     right: 12px;
+    top: 56px;
+    z-index: 1;
   }
 
   .v-picker--dates-extended.breakpoint-sm-and-up .v-btn-toggle--presets {
