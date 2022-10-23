@@ -17,12 +17,14 @@
         class="my-1"
       ></v-btn>
     </v-btn-toggle>
+    <!-- :fab="isXSBreakpoint" -->
     <v-btn
       v-if="isSmAndUpBreakpoint"
       ref="toggler"
       light
       x-small
-      @click.stop="$emit('toggle-presets', !collapsed)"
+      icon
+      @click.stop="$emit('toggle-presets')"
       class="v-btn-toggle--presets"
     >
       <v-icon dark v-text="togglerIcon"></v-icon>

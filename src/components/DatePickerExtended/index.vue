@@ -8,13 +8,13 @@
       collapsed: shownPresets,
     }"
     @click:date="presetsKey++"
-    @toggle-pressets="TestFunc"
+    @toggle-presets="toggleShowDatesPresetes"
     :presets-shown="shownPresets"
   >
     <template #presets>
       <date-picker-presets
         @click-preset-btn="presetsClicked"
-        @click-collapse="toggleShowDatesPresetes"
+        @toggle-presets="toggleShowDatesPresetes"
         :collapsed="shownPresets"
         :key="presetsKey"
       ></date-picker-presets>
@@ -72,7 +72,7 @@
               'x-small': true,
             },
             on: {
-              click: () => this.$emit('toggle-pressets'),
+              click: () => this.$emit('toggle-presets'),
             },
           },
           [this.genTogglerIcon()]
@@ -123,7 +123,7 @@
             ...this.elevationClasses,
           },
           on: {
-            'toggle-pressets': () => this.$emit('toggle-pressets'),
+            'toggle-presets': () => this.$emit('toggle-presets'),
           },
         },
         [
@@ -205,7 +205,7 @@
               presetsShown: this.presetsShown, // Add
             },
             on: {
-              'toggle-pressets': () => this.$emit('toggle-pressets'),
+              'toggle-presets': () => this.$emit('toggle-presets'),
             },
           },
           children
@@ -248,17 +248,13 @@
       this.localDates = [...this.dates];
     },
     methods: {
-      TestFunc() {
-        console.log('TestFunc');
-        this.shownPresets = !this.shownPresets;
-      },
       presetsClicked(dates) {
         if (dates != null) {
           this.localDates = dates;
         }
       },
-      toggleShowDatesPresetes(val) {
-        this.shownPresets = val;
+      toggleShowDatesPresetes() {
+        this.shownPresets = !this.shownPresets;
         this.$nextTick(() => {
           this.SetStateToLocalStorage(this.shownPresets);
         });
